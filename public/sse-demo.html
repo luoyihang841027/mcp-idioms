@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成语接龙 SSE 演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+        }
+
+        .panel h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+        }
+
+        .status-dot.connected {
+            background: #28a745;
+        }
+
+        .game-controls {
+            display: grid;
+            gap: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+        }
+
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .game-state {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .chain {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .idiom {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .events {
+            height: 300px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .event {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+            background: #f8f9fa;
+        }
+
+        .event-time {
+            color: #6c757d;
+            font-size: 0.8em;
+        }
+
+        .event-type {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .hints {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .hint {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 成语接龙 SSE 演示</h1>
+            <p>实时服务器推送事件演示</p>
+        </div>
+
+        <div class="main">
+            <div class="panel">
+                <h2>🎮 游戏控制</h2>
+                
+                <div class="status">
+                    <div class="status-dot" id="connectionStatus"></div>
+                    <span id="connectionText">连接中...</span>
+                </div>
+
+                <div class="game-controls">
+                    <button class="btn" onclick="startGame()">🚀 开始新游戏</button>
+                    
+                    <div class="input-group">
+                        <input type="text" id="idiomInput" placeholder="输入成语..." maxlength="4">
+                        <button class="btn" onclick="addIdiom()">➕ 添加</button>
+                    </div>
+                    
+                    <button class="btn" onclick="autoPlay()">🤖 AI接龙</button>
+                    <button class="btn" onclick="getHints()">💡 获取提示</button>
+                    <button class="btn" onclick="resetGame()">🔄 重置游戏</button>
+                </div>
+
+                <div class="game-state" id="gameState">
+                    <strong>游戏状态:</strong> 未开始
+                </div>
+
+                <div class="hints" id="hintsContainer" style="display: none;">
+                    <strong>💡 提示:</strong>
+                    <div id="hints"></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>📡 实时事件</h2>
+                <div class="events" id="events">
+                    <div class="event">
+                        <div class="event-time">等待连接...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let eventSource = null;
+        let gameStarted = false;
+
+        // 初始化SSE连接
+        function initSSE() {
+            eventSource = new EventSource('/events');
+            
+            eventSource.onopen = function() {
+                updateConnectionStatus(true);
+                addEvent('连接已建立', 'connection');
+            };
+            
+            eventSource.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleGameEvent(data);
+                } catch (e) {
+                    addEvent(`收到消息: ${event.data}`, 'message');
+                }
+            };
+            
+            eventSource.onerror = function() {
+                updateConnectionStatus(false);
+                addEvent('连接错误', 'error');
+            };
+        }
+
+        // 更新连接状态
+        function updateConnectionStatus(connected) {
+            const dot = document.getElementById('connectionStatus');
+            const text = document.getElementById('connectionText');
+            
+            if (connected) {
+                dot.classList.add('connected');
+                text.textContent = 'SSE 已连接';
+            } else {
+                dot.classList.remove('connected');
+                text.textContent = 'SSE 未连接';
+            }
+        }
+
+        // 添加事件到显示区域
+        function addEvent(message, type) {
+            const eventsContainer = document.getElementById('events');
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'event';
+            
+            const time = new Date().toLocaleTimeString();
+            eventDiv.innerHTML = `
+                <div class="event-time">${time}</div>
+                <div class="event-type">${type}</div>
+                <div>${message}</div>
+            `;
+            
+            eventsContainer.appendChild(eventDiv);
+            eventsContainer.scrollTop = eventsContainer.scrollHeight;
+        }
+
+        // 处理游戏事件
+        function handleGameEvent(data) {
+            addEvent(`游戏事件: ${data.type}`, 'game_event');
+            
+            if (data.data && data.data.gameState) {
+                updateGameState(data.data.gameState);
+            }
+        }
+
+        // 更新游戏状态显示
+        function updateGameState(state) {
+            const gameStateDiv = document.getElementById('gameState');
+            
+            if (state.gameStarted) {
+                gameStarted = true;
+                gameStateDiv.innerHTML = `
+                    <strong>游戏状态:</strong> 进行中<br>
+                    <strong>当前字:</strong> ${state.currentChar || '无'}<br>
+                    <strong>成语数量:</strong> ${state.chainLength || 0}<br>
+                    <div class="chain">
+                        ${(state.chain || []).map(idiom => `<span class="idiom">${idiom}</span>`).join('')}
+                    </div>
+                `;
+            } else {
+                gameStarted = false;
+                gameStateDiv.innerHTML = '<strong>游戏状态:</strong> 未开始';
+            }
+        }
+
+        // API调用函数
+        async function callAPI(endpoint, method = 'GET', body = null) {
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+                
+                const response = await fetch(endpoint, options);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP ${response.status}`);
+                }
+                
+                return data;
+            } catch (error) {
+                addEvent(`API错误: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        // 游戏控制函数
+        async function startGame() {
+            try {
+                const result = await callAPI('/api/call/start_game', 'POST', {});
+                addEvent('游戏已开始', 'success');
+            } catch (error) {
+                // 错误已在callAPI中处理
+            }
+        }
+
+        async function addIdiom() {
+            const input = document.getElementById('idiomInput');
+            const idiom = input.value.trim();
+            
+            if (!idiom) {
+                addEvent('请输入成语', 'warning');
+                return;
+            }
+            
+            try {
+                const result = await callAPI('/api/call/add_idiom', 'POST', {
+                    arguments: { idiom }
+                });
+                input.value = '';
+                addEvent(`成功添加成语: ${idiom}`, 'success');
+            } catch (error) {
+                // 错误已在callAPI中处理
+            }
+        }
+
+        async function autoPlay() {
+            try {
+                const result = await callAPI('/api/call/auto_play', 'POST', {});
+                addEvent('AI自动接龙完成', 'success');
+            } catch (error) {
+                // 错误已在callAPI中处理
+            }
+        }
+
+        async function getHints() {
+            try {
+                const result = await callAPI('/api/call/get_hints', 'POST', {});
+                displayHints(result.result);
+                addEvent('获取提示成功', 'success');
+            } catch (error) {
+                // 错误已在callAPI中处理
+            }
+        }
+
+        async function resetGame() {
+            try {
+                const result = await callAPI('/api/call/reset_game', 'POST', {});
+                document.getElementById('hintsContainer').style.display = 'none';
+                addEvent('游戏已重置', 'success');
+            } catch (error) {
+                // 错误已在callAPI中处理
+            }
+        }
+
+        // 显示提示
+        function displayHints(hints) {
+            const hintsContainer = document.getElementById('hintsContainer');
+            const hintsDiv = document.getElementById('hints');
+            
+            if (hints && hints.length > 0) {
+                hintsDiv.innerHTML = hints.map(hint => `
+                    <div class="hint">
+                        <strong>${hint.text}</strong><br>
+                        <small>${hint.pinyin} - ${hint.meaning}</small>
+                    </div>
+                `).join('');
+                hintsContainer.style.display = 'block';
+            } else {
+                hintsContainer.style.display = 'none';
+            }
+        }
+
+        // 键盘事件
+        document.getElementById('idiomInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addIdiom();
+            }
+        });
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initSSE();
+            addEvent('页面加载完成', 'info');
+        });
+
+        // 页面卸载时关闭连接
+        window.addEventListener('beforeunload', function() {
+            if (eventSource) {
+                eventSource.close();
+            }
+        });
+    </script>
+</body>
+</html>

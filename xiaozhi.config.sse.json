@@ -1,0 +1,76 @@
+{
+  "mcpEndpoint": "你的小智接入点地址",
+  "transport": "sse",
+  "mcpServers": {
+    "idiom-chain": {
+      "command": "node",
+      "args": ["src/index.js"],
+      "cwd": "/Users/luoyichang/newcode",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "description": "智能成语接龙游戏MCP服务器 (SSE传输)",
+      "capabilities": {
+        "tools": true
+      },
+      "transport": "sse",
+      "sseConfig": {
+        "port": 3001,
+        "host": "localhost",
+        "endpoint": "/events",
+        "autoStart": true
+      }
+    }
+  },
+  "tools": {
+    "visibility": {
+      "idiom-chain": {
+        "start_game": true,
+        "add_idiom": true,
+        "get_hints": true,
+        "get_game_state": true,
+        "auto_play": true,
+        "reset_game": true,
+        "validate_idiom": true,
+        "get_random_idiom": true,
+        "get_stats": true,
+        "start_sse_server": true,
+        "get_sse_info": true
+      }
+    }
+  },
+  "logging": {
+    "level": "info",
+    "file": "xiaozhi-client-sse.log"
+  },
+  "server": {
+    "port": 3000,
+    "host": "localhost"
+  },
+  "sse": {
+    "enabled": true,
+    "port": 3001,
+    "host": "localhost",
+    "endpoint": "/events",
+    "cors": {
+      "origin": "*",
+      "methods": ["GET", "POST", "OPTIONS"],
+      "allowedHeaders": ["Content-Type", "Authorization"]
+    },
+    "heartbeat": {
+      "enabled": true,
+      "interval": 30000
+    },
+    "reconnect": {
+      "enabled": true,
+      "maxAttempts": 5,
+      "delay": 1000
+    }
+  },
+  "features": {
+    "webUI": true,
+    "autoReconnect": true,
+    "toolsManagement": true,
+    "sseSupport": true
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "mcpEndpoint": "你的小智接入点地址",
+  "mcpServers": {
+    "idiom-chain": {
+      "command": "node",
+      "args": ["src/index.js"],
+      "cwd": "/Users/luoyichang/newcode",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "description": "智能成语接龙游戏MCP服务器",
+      "capabilities": {
+        "tools": true
+      }
+    }
+  },
+  "tools": {
+    "visibility": {
+      "idiom-chain": {
+        "start_game": true,
+        "add_idiom": true,
+        "get_hints": true,
+        "get_game_state": true,
+        "auto_play": true,
+        "reset_game": true,
+        "validate_idiom": true,
+        "get_random_idiom": true,
+        "get_stats": true,
+        "start_sse_server": false,
+        "get_sse_info": false
+      }
+    }
+  },
+  "logging": {
+    "level": "info",
+    "file": "xiaozhi-client.log"
+  },
+  "server": {
+    "port": 3000,
+    "host": "localhost"
+  },
+  "features": {
+    "webUI": true,
+    "autoReconnect": true,
+    "toolsManagement": true
+  }
+}

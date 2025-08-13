@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "idiom-chain": {
+      "command": "node",
+      "args": ["src/index.js"],
+      "cwd": "/Users/luoyichang/newcode",
+      "env": {}
+    }
+  }
+}

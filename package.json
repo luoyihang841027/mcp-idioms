@@ -1,0 +1,54 @@
+{
+  "name": "idiom-chain-mcp",
+  "version": "1.0.0",
+  "description": "成语接龙 MCP 应用",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node test/test.js",
+    "sse": "node src/sse-server.js",
+    "sse-dev": "node --watch src/sse-server.js",
+    "start-all": "concurrently \"npm run start\" \"npm run sse\"",
+    "xiaozhi-bridge": "node src/xiaozhi-bridge.js",
+    "xiaozhi-dev": "nodemon src/xiaozhi-bridge.js",
+    "xiaozhi-demo": "node demo-xiaozhi.js",
+    "xiaozhi-config": "node demo-xiaozhi.js config",
+    "xiaozhi-status": "node demo-xiaozhi.js status",
+    "xiaozhi-install": "npm i -g xiaozhi-client",
+    "xiaozhi-quick": "echo '请参考 QUICK_START_XIAOZHI.md 快速接入小智系统'",
+    "xiaozhi-sse": "xiaozhi start --config xiaozhi.config.sse.json",
+    "xiaozhi-sse-dev": "xiaozhi start --config xiaozhi.config.sse.json --watch",
+    "xiaozhi-sse-status": "curl -s http://localhost:3001/status | jq .",
+    "xiaozhi-sse-events": "curl -N http://localhost:3001/events",
+    "demo-sse": "node demo-sse.js",
+    "demo-sse-simple": "node demo-sse-simple.js",
+    "demo-xiaozhi-client": "node example-xiaozhi-client.js",
+    "demo-xiaozhi-client-standard": "node example-xiaozhi-client.js standard",
+    "demo-sse-monitor": "node demo-sse.js monitor",
+    "demo-sse-status": "node demo-sse.js status",
+    "test-sse-xiaozhi": "node test/test-sse-xiaozhi.js",
+    "test-all": "npm run test && npm run test-sse-xiaozhi"
+  },
+  "keywords": [
+    "mcp",
+    "idiom",
+    "chinese",
+    "game"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "concurrently": "^7.6.0",
+    "cors": "^2.8.5",
+    "eventsource": "^4.0.0",
+    "express": "^4.21.2",
+    "node-fetch": "^3.3.2",
+    "ws": "^8.18.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

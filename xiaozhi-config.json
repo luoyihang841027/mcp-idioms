@@ -1,0 +1,54 @@
+{
+  "name": "成语接龙MCP服务",
+  "description": "智能成语接龙游戏，支持AI自动接龙、提示和统计功能",
+  "version": "1.0.0",
+  "mcpServers": {
+    "idiom-chain-mcp": {
+      "command": "node",
+      "args": ["src/index.js"],
+      "cwd": "/Users/luoyichang/newcode",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "transport": "stdio",
+      "description": "成语接龙MCP服务器",
+      "tools": [
+        "start_game",
+        "add_idiom", 
+        "get_hints",
+        "get_game_state",
+        "auto_play",
+        "reset_game",
+        "validate_idiom",
+        "get_random_idiom",
+        "get_stats",
+        "start_sse_server",
+        "get_sse_info"
+      ]
+    }
+  },
+  "xiaozhi": {
+    "endpoint": "wss://api.xiaozhi.me/mcp/?token=YOUR_XIAOZHI_TOKEN_HERE",
+    "reconnect": {
+      "enabled": true,
+      "maxRetries": 5,
+      "backoffMs": 1000
+    },
+    "features": {
+      "mcp": true,
+      "realtime": true
+    }
+  },
+  "bridge": {
+    "port": 8080,
+    "host": "localhost",
+    "cors": {
+      "enabled": true,
+      "origins": ["*"]
+    },
+    "logging": {
+      "level": "info",
+      "file": "xiaozhi-bridge.log"
+    }
+  }
+}
