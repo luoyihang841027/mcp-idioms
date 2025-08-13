@@ -336,7 +336,16 @@ xiaozhi endpoint list
 
 ## 更新日志
 
+- v1.2.0: 新增xiaozhi-client完整对接方案
+  - 创建XIAOZHI_CLIENT_INTEGRATION.md详细对接指南
+  - 新增example-xiaozhi-client.js使用示例
+  - 支持标准MCP和SSE双模式对接
+  - 提供完整的配置文件模板和演示脚本
+- v1.1.0: 完善SSE实时推送功能
+  - 优化SSE服务器性能和稳定性
+  - 新增Web UI演示页面
+  - 完善MCP兼容性接口
 - v1.0.0: 初始版本，支持基本MCP桥接功能
-- 支持自动重连和错误恢复
-- 支持所有成语接龙工具
-- 支持SSE实时推送集成
+  - 支持自动重连和错误恢复
+  - 支持所有成语接龙工具
+  - 支持SSE实时推送集成
